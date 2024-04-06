@@ -1,0 +1,17 @@
+﻿<Page x:Class="Pizzeria.Active_Orders_Window"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Pizzeria"
+      mc:Ignorable="d" 
+      d:DesignHeight="433.04" d:DesignWidth="896"
+      Title="Active_Orders_Window">
+
+    <Grid>
+        <StackPanel Margin="0,21,0,66" HorizontalAlignment="Center">
+            <Label Foreground="White" HorizontalAlignment="Center" FontSize="20" >Active Orders</Label>
+            <ListBox x:Name="LB_ActiveOrders" d:ItemsSource="{d:SampleData ItemCount=5}" Width="678" HorizontalAlignment="Left" Height="310" FontSize="20" />
+        </StackPanel>
+    </Grid>
+</Page>

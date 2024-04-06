@@ -1,0 +1,31 @@
+﻿<Page x:Class="Pizzeria.AddClientsWindow"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Pizzeria"
+      mc:Ignorable="d" 
+      d:DesignHeight="433.04" d:DesignWidth="896"
+      Title="AddClientsWindow">
+
+    <Grid>
+        <StackPanel Margin="80,83,527,62" >
+            <TextBox VerticalAlignment="Center" Margin="0,20,0,0" Height="20">Client Name</TextBox>
+            <TextBox VerticalAlignment="Center" Margin="0,20,0,0" Height="20">Phone</TextBox>
+            <ComboBox x:Name="CB_Adresses" VerticalAlignment="Center" Margin="0,20,0,0" Height="20">Adresses</ComboBox>
+            <TextBox x:Name="TB_AddAdress" AcceptsReturn="True" Height="60" VerticalAlignment="Center" Margin="0,20,0,0" TextWrapping="Wrap">New Adress</TextBox>
+        </StackPanel>
+        <StackPanel Margin="378,83,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="194">
+            <Button Margin="0,20,0,0" HorizontalAlignment="Left" Width="70">Add</Button>
+            <Button x:Name="BTN_SaveEdit" Content="Edit" Margin="0,20,0,0" HorizontalAlignment="Left" Width="70" Click="BTN_SaveEdit_Click"/>
+            <Button Content="+" Width="20" HorizontalAlignment="Left" Margin="0,20,0,0" Click="BTN_ShowAdressAdder"/>
+            <Button x:Name="BTN_AddAdress" Content="Add Adress" Margin="0,40,0,0" HorizontalAlignment="Left" Width="70" />
+        </StackPanel>
+        <StackPanel Margin="468,83,68,112">
+            <StackPanel Background="#FF020A79">
+                <Label Foreground="White" HorizontalAlignment="Center" FontSize="20">Clients</Label>
+            </StackPanel>
+            <ListBox Height="205"/>
+        </StackPanel>
+    </Grid>
+</Page>
