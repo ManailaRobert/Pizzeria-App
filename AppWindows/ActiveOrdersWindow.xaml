@@ -12,6 +12,8 @@
         <StackPanel Margin="0,21,0,66" HorizontalAlignment="Center">
             <Label Foreground="White" HorizontalAlignment="Center" FontSize="20" >Active Orders</Label>
             <ListBox x:Name="LB_ActiveOrders" d:ItemsSource="{d:SampleData ItemCount=5}" Width="678" HorizontalAlignment="Left" Height="310" FontSize="20" />
+            
         </StackPanel>
+        <Button Click="BTN_Click" Margin="411,375,404,32" >BTN</Button>
     </Grid>
 </Page>
