@@ -9,9 +9,9 @@
       Title="OrderWindow">
 
     <Grid Height="433">
-        <StackPanel x:Name="Left" Margin="46,39,557,61" Width="197">
+        <StackPanel x:Name="Left" Margin="94,39,605,51" Width="197">
             <StackPanel Orientation="Horizontal">
-                <Button x:Name="BTN_Pizza" Content="Pizza" HorizontalAlignment="Left"  VerticalAlignment="Top" RenderTransformOrigin="0.49,-0.501" Width="98" Height="20" Click="BTN_Pizza_Click"/>
+                <Button x:Name="BTN_Pizza" Content="Pizza" HorizontalAlignment="Left"  VerticalAlignment="Top" RenderTransformOrigin="0.49,-0.501" Width="98" Height="20" Click="BTN_Pizza_Click" IsEnabled="False"/>
                 <Button x:Name="BTN_Beverage" Content="Beverage"  VerticalAlignment="Top" RenderTransformOrigin="0.49,-0.501" Width="99" Height="20" BorderBrush="#FF9A9A9A" Click="BTN_Beverage_Click"/>
             </StackPanel>
             <ListBox d:ItemsSource="{d:SampleData ItemCount=5}" Height="251" />
@@ -19,7 +19,7 @@
                 <Label Content="Size" HorizontalAlignment="Left"  VerticalAlignment="Top" Foreground="White"/>
                 <ComboBox  VerticalAlignment="Center" Width="160"/>
             </StackPanel>
-            <Button Content="Add" HorizontalAlignment="Center"  VerticalAlignment="Top" RenderTransformOrigin="0.49,-0.501" Width="60"/>
+            <Button Content="Add" Margin="0,10,0,0" RenderTransformOrigin="0.49,-0.501" Width="60"/>
         </StackPanel>
 
         <StackPanel x:Name="Middle" Margin="304,39,304,51" Width="193">
