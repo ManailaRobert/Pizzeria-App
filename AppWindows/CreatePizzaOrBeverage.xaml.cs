@@ -32,6 +32,7 @@ namespace Pizzeria.AppWindows
             TB_Price.IsEnabled = false;
             LB_Ingredients.IsEnabled = true;
             TB_Name.Text = "Pizza Name";
+            CB_Sizes.IsEnabled = false;
         }
 
         private void RB_Beverage_Checked(object sender, RoutedEventArgs e)
@@ -40,9 +41,17 @@ namespace Pizzeria.AppWindows
             TB_Price.IsEnabled = true;
             LB_Ingredients.IsEnabled = false;
             TB_Name.Text = "Beverage Name";
+            CB_Sizes.IsEnabled = false;
 
         }
-
+        private void RB_CustomPizza_Checked(object sender, RoutedEventArgs e)
+        {
+            BTN_Create.Content = "Create Custom Pizza";
+            TB_Price.IsEnabled = false;
+            LB_Ingredients.IsEnabled = true;
+            TB_Name.Text = "Custom Pizza Name";
+            CB_Sizes.IsEnabled = true;
+        }
         private void BTN_Pizza_Click(object sender, RoutedEventArgs e)
         {
             BTN_Pizza.IsEnabled = false;
@@ -56,5 +65,7 @@ namespace Pizzeria.AppWindows
             BTN_Pizza.IsEnabled = true;
             //load beverages
         }
+
+
     }
 }
