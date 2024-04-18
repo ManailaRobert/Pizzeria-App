@@ -20,6 +20,7 @@ namespace Pizzeria
         public MainWindow()
         {
             InitializeComponent();
+            
         }
         object previousPage;
         private void BTN_Order_Click(object sender, RoutedEventArgs e)
