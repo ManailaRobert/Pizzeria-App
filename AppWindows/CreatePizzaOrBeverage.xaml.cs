@@ -35,6 +35,7 @@ namespace Pizzeria.AppWindows
                 try {
                     IngredientsList = db.Ingredients.ToList();
                     LB_Ingredients.ItemsSource = IngredientsList;
+                    //MessageBox.Show("Loaded Ingredients");
                 }
                 catch (Exception ex) {
                     MessageBox.Show($"Error Loading Ingredients");
