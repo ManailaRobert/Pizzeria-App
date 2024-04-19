@@ -27,7 +27,7 @@ namespace Pizzeria.AppWindows
             InitializeComponent();
             RB_Pizza.IsChecked = true;
         }
-        private List<Ingredients> IngredientsList;
+        private List<Ingredient> IngredientsList;
         private void Grid_Loaded(object sender, RoutedEventArgs e)
         {
             using (var db = new PizzeriaDBContext())

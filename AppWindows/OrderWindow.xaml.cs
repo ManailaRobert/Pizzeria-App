@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Pizzeria
+namespace Pizzeria.AppWindows
 {
     /// <summary>
     /// Interaction logic for OrderWindow.xaml
