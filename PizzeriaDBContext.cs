@@ -42,6 +42,12 @@ namespace Pizzeria
                     .HasMany(a => a.Orders)
                     .WithOne(b => b.Customer)
                     .HasForeignKey(c => c.CustomerID);
+            //Adress relationship -> not tested
+            modelBuilder.Entity<Adress>().HasKey(a => a.AdressID);
+            modelBuilder.Entity<Adress>()
+                .HasOne(a => a.Customer)
+                .WithMany(b=> b.Adresses)
+                .HasForeignKey(c => c.CustomerID);
 
             //OrderBeverage relationship -> not tested
             modelBuilder.Entity<OrderBeverage>().HasKey(a => a.OrderBeverageID);
@@ -98,10 +104,9 @@ namespace Pizzeria
                 .WithOne(b => b.Ingredient)
                 .HasForeignKey(c => c.IngredientID);
 
-            //Adress relationship -> not tested-------------------------------------------------
-            modelBuilder.Entity<Adress>().HasKey(a => a.AdressID);
 
-            //Order Relationship -> not tested
+
+            //Order Relationship -> not tested -------------------------------------------------
             modelBuilder.Entity<Order>().HasKey(a => a.OrderID);
             //BeverageRelationship -> not tested
             modelBuilder.Entity<Beverage>().HasKey(a => a.BeverageID);

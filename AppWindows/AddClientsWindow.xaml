@@ -10,22 +10,27 @@
 
     <Grid>
         <StackPanel Margin="80,83,527,62" >
-            <TextBox VerticalAlignment="Center" Margin="0,20,0,0" Height="20">Client Name</TextBox>
-            <TextBox VerticalAlignment="Center" Margin="0,20,0,0" Height="20">Phone</TextBox>
-            <ComboBox x:Name="CB_Adresses" VerticalAlignment="Center" Margin="0,20,0,0" Height="20">Adresses</ComboBox>
+            <TextBox x:Name="TB_Name" VerticalAlignment="Center" Margin="0,20,0,0" Height="20" IsEnabled="False">Client Name</TextBox>
+            <TextBox x:Name="TB_Phone" VerticalAlignment="Center" Margin="0,20,0,0" Height="20" IsEnabled="False">Phone</TextBox>
+            <ComboBox x:Name="CB_Adresses" VerticalAlignment="Center" Margin="0,20,0,0" Height="20" SelectedIndex="0"></ComboBox>
             <TextBox x:Name="TB_AddAdress" AcceptsReturn="True" Height="60" VerticalAlignment="Center" Margin="0,20,0,0" TextWrapping="Wrap">New Adress</TextBox>
+            <Button x:Name="BTN_Cancel" Width="50" Margin="0,15,0,0" Click="BTN_Cancel_Click">Cancel</Button>
         </StackPanel>
         <StackPanel Margin="378,83,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="194">
-            <Button Margin="0,20,0,0" HorizontalAlignment="Left" Width="70">Add</Button>
-            <Button x:Name="BTN_SaveEdit" Content="Edit" Margin="0,20,0,0" HorizontalAlignment="Left" Width="70" Click="BTN_SaveEdit_Click"/>
-            <Button Content="+" Width="20" HorizontalAlignment="Left" Margin="0,20,0,0" Click="BTN_ShowAdressAdder"/>
-            <Button x:Name="BTN_AddAdress" Content="Add Adress" Margin="0,40,0,0" HorizontalAlignment="Left" Width="70" />
+            <Button x:Name="BTN_AddClient" Margin="0,20,0,0" HorizontalAlignment="Left" Width="70" Click="BTN_AddClient_Click" Content="Add Client"/>
+            <Button x:Name="BTN_EditClient" Content="Edit Client" Margin="0,20,0,0" HorizontalAlignment="Left" Width="70" Click="BTN_EditClient_Click" IsEnabled="False"/>
+            <StackPanel Margin="0,20,0,0" Orientation="Horizontal">
+                <Button x:Name="BTN_ShowAdressAdder" Content="+" Width="20" HorizontalAlignment="Left"  Click="BTN_ShowAdressAdder_Click" IsEnabled="False"/>
+                <Button x:Name="BTN_EditAdress" Content="Edit" Width="35" Margin="15,0,0,0" Click="BTN_EditAdress_Click" IsEnabled="False"/>
+            </StackPanel>
+            <Button x:Name="BTN_AddAdress" Content="Add Adress" Margin="0,40,0,0" HorizontalAlignment="Left" Width="70" Click="BTN_AddAdress_Click" />
         </StackPanel>
         <StackPanel Margin="468,83,68,112">
             <StackPanel Background="#FF020A79">
                 <Label Foreground="White" HorizontalAlignment="Center" FontSize="20">Clients</Label>
             </StackPanel>
-            <ListBox Height="205"/>
+            <ListBox x:Name="LB_Clients" Height="205" SelectionChanged="LB_Clients_SelectionChanged" SelectedIndex="-1"/>
+            
         </StackPanel>
     </Grid>
 </Page>

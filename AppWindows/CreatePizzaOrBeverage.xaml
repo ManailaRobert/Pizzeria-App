@@ -8,7 +8,7 @@
       d:DesignHeight="433.04" d:DesignWidth="896"
       Title="CreatePizzaOrBeverage">
 
-    <Grid Loaded="Grid_Loaded">
+    <Grid >
         <StackPanel Margin="80,18,474,14">
             <StackPanel Margin="0,5,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
                 <Label Foreground="White" VerticalAlignment="Center">Product type: </Label>

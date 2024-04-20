@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Pizzeria.AppWindows
 {
@@ -27,20 +28,6 @@ namespace Pizzeria.AppWindows
         {
             InitializeComponent();
             RB_Pizza.IsChecked = true;
-        }
-        private List<Ingredient> IngredientsLoadList;
-        private List<Ingredient> IngredientsList;
-        private double Price ;
-        private List<Sizes> SizesList;
-        private List<Pizza> PizzaList;
-        private List<Beverage> BeverageList;
-
-        private void ReLoadLB()
-        {
-            
-        }
-        private void Grid_Loaded(object sender, RoutedEventArgs e)
-        {
 
             AppUtilities.LoadLBBeverages(LB_PizzaOrBeverage, BeverageList);
             AppUtilities.LoadLBPizza(LB_PizzaOrBeverage, PizzaList);
@@ -55,8 +42,7 @@ namespace Pizzeria.AppWindows
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error loading Ingredients");
-                    File.WriteAllText("error.txt", ex.ToString());
+                    AppUtilities.ShowError(ex,"Error loading Ingredients");
                 }
 
                 try
@@ -64,18 +50,25 @@ namespace Pizzeria.AppWindows
                     SizesList = db.Sizes.ToList();
                     CB_Sizes.ItemsSource = SizesList;
                     CB_Sizes.SelectedItem = CB_Sizes.Items[0];
-                   
+
                     //MessageBox.Show("Loaded Ingredients");
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error loading Sizes");
-                    File.WriteAllText("error.txt", ex.ToString());
+                    AppUtilities.ShowError(ex, "Error loading Sizes");
                 }
 
 
             }
         }
+        private List<Ingredient> IngredientsLoadList;
+        private List<Ingredient> IngredientsList;
+        private double Price ;
+        private List<Sizes> SizesList;
+        private List<Pizza> PizzaList;
+        private List<Beverage> BeverageList;
+
+
         private void RB_Pizza_Checked(object sender, RoutedEventArgs e)
         {
             BTN_Create.Content = "Create Pizza";
@@ -107,7 +100,11 @@ namespace Pizzeria.AppWindows
         {
             BTN_Pizza.IsEnabled = false;
             BTN_Beverage.IsEnabled = true;
-            TB_Price.IsEnabled = false;
+            if(RB_Beverage.IsChecked == false)
+            {
+                TB_Price.IsEnabled = false;
+                LB_Ingredients.IsEnabled = true;
+            }
             CB_Sizes.IsEnabled = true;
 
             BTN_Edit.Content = "Edit Pizza";
@@ -121,8 +118,12 @@ namespace Pizzeria.AppWindows
             BTN_Pizza.IsEnabled = true;
             BTN_Edit.Content = "Edit Beverage";
             CB_Sizes.IsEnabled = false;
-            TB_Price.IsEnabled = true;
-            LB_Ingredients.IsEnabled = false;
+
+            if(RB_Beverage.IsChecked == true)
+            {
+                TB_Price.IsEnabled = true; 
+                LB_Ingredients.IsEnabled = false;
+            }
 
 
             AppUtilities.LoadLBBeverages(LB_PizzaOrBeverage, BeverageList);
@@ -163,29 +164,38 @@ namespace Pizzeria.AppWindows
                     {
                         if(IngredientsList.Count > 0)
                         {
-                            if(String.IsNullOrEmpty(TB_Name.Text) == false)
+                            Pizza pizza;
+                            try
                             {
                                 string PizzaName = TB_Name.Text;
                                 int sizeID = ((Sizes)CB_Sizes.SelectedItem).SizeID;
                                 string custom = RB_CustomPizza.IsChecked == true ? "da" : "nu";
+                                pizza = new Pizza(PizzaName, Price, sizeID, custom);
+                            }
+                            catch (Exception ex)
+                            { 
+                                MessageBox.Show(ex.Message);
+                                return; 
+                            }
+                            db.Pizza.Add(pizza);
+                            db.SaveChanges();
 
-                                Pizza pizza = new Pizza(PizzaName, Price, sizeID, custom);
-                                //verify if already exists
-                                db.Pizza.Add(pizza);
-                                db.SaveChanges();
+                            //get last pizza inserted
+                            Pizza newPizza = db.Pizza
+                                .Include(pizza => pizza.IngredientsGroup)
+                                .FirstOrDefault(pizzaFromDB => pizzaFromDB.PizzaID == pizza.PizzaID);
 
-                                foreach (Ingredient ingredient in IngredientsList)
-                                {
-                                    IngredientsGroup group = new IngredientsGroup(ingredient.IngredientID, pizza.PizzaID);
-                                    db.IngredientsGroup.Add(group);
-                                }
-                                db.SaveChanges();
+                            // add ingredients to last pizza inserted
+                            foreach (Ingredient ingredient in IngredientsList)
+                                pizza.IngredientsGroup.Add(new IngredientsGroup(ingredient.IngredientID, pizza.PizzaID));
 
-                                if (BTN_Pizza.IsEnabled == false)
-                                    AppUtilities.LoadLBPizza(LB_PizzaOrBeverage, PizzaList);
-                                IngredientsList.Clear();
-                                MessageBox.Show("Pizza created");
-                            }else MessageBox.Show("Invalid Name for the pizza");
+                            db.SaveChanges();
+
+                            if (BTN_Pizza.IsEnabled == false)
+                                AppUtilities.LoadLBPizza(LB_PizzaOrBeverage, PizzaList);
+                            IngredientsList.Clear();
+                            LB_Ingredients.SelectedItems.Clear();
+                            MessageBox.Show("Pizza created");
 
                         }
                         else MessageBox.Show("Insuficient ingredients");
@@ -193,8 +203,7 @@ namespace Pizzeria.AppWindows
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Error adding pizza");
-                        File.WriteAllText("error.txt", ex.ToString());
+                        AppUtilities.ShowError(ex, "Error adding pizza");
                     }
                 }
             }
@@ -205,36 +214,37 @@ namespace Pizzeria.AppWindows
                 {
                     try
                     {
-                        if (String.IsNullOrEmpty(TB_Name.Text) == false)
+
+                        if (double.TryParse(TB_Price.Text.Split("")[0],out double result))
                         {
-                            if (double.TryParse(TB_Price.Text.Split("")[0],out double result))
-                            {
-                                string beverageName = TB_Name.Text;
+                            string beverageName = TB_Name.Text;
 
-                                double beveragePrice = result;
-
-                                Beverage beverage = new Beverage(beverageName, beveragePrice);
-                                //verify if already exists
-                                db.Beverages.Add(beverage);
-
-                                db.SaveChanges();
-
-
-                                if (BTN_Beverage.IsEnabled == false)
-                                    AppUtilities.LoadLBBeverages(LB_PizzaOrBeverage, BeverageList);
+                            double beveragePrice = result;
+                            Beverage beverage;
+                            try{
+                                beverage = new Beverage(beverageName, beveragePrice);
 
                                 MessageBox.Show("Beverage Created");
                             }
-                            else MessageBox.Show("Invalid Price");
+                            catch (Exception ex)
+                                {
+                                MessageBox.Show(ex.Message);
+                                return;
+                                }
+                            db.Beverages.Add(beverage);
+                            db.SaveChanges();
+
+
+                            if (BTN_Beverage.IsEnabled == false)
+                                AppUtilities.LoadLBBeverages(LB_PizzaOrBeverage, BeverageList);
 
                         }
-                        else MessageBox.Show("Invalid name for the beverage");
+                        else MessageBox.Show("Invalid Price");
 
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Error adding beverage");
-                        File.WriteAllText("error.txt", ex.ToString());
+                        AppUtilities.ShowError(ex, "Error adding beverage");
                     }
                 }
                 
@@ -244,8 +254,8 @@ namespace Pizzeria.AppWindows
         private void BTN_Edit_Click(object sender, RoutedEventArgs e)
         {
 
-                Pizza pizza;
-                if (String.Equals(BTN_Edit.Content, "Edit Pizza"))
+            Pizza pizza;
+            if (String.Equals(BTN_Edit.Content, "Edit Pizza"))
                 {
                   
                     if (LB_PizzaOrBeverage.SelectedItem != null)
@@ -257,6 +267,7 @@ namespace Pizzeria.AppWindows
                         BTN_Create.IsEnabled = false;
                         LB_PizzaOrBeverage.IsEnabled = false;
                         BTN_Beverage.IsEnabled = false;
+                        TB_Price.IsEnabled = false;
                         
 
                         LB_Ingredients.IsEnabled = true;
@@ -281,8 +292,7 @@ namespace Pizzeria.AppWindows
                             }
                             catch (Exception ex)
                             {
-                                MessageBox.Show($"Error retriving pizza details");
-                                File.WriteAllText("error.txt", ex.ToString());
+                                AppUtilities.ShowError(ex, "Error retriving pizza details");
                             }
                         }
 
@@ -290,7 +300,7 @@ namespace Pizzeria.AppWindows
                     }
 
                 }
-                else if(String.Equals(BTN_Edit.Content, "Save Pizza"))
+            else if(String.Equals(BTN_Edit.Content, "Save Pizza"))
                 {
                     //on save
                     using (PizzeriaDBContext db = new PizzeriaDBContext())
@@ -304,9 +314,18 @@ namespace Pizzeria.AppWindows
                                     .Include(pizza => pizza.IngredientsGroup)
                                     .ThenInclude(ingredientsGroup => ingredientsGroup.Ingredient)
                                     .FirstOrDefault(pizza => pizza.PizzaID == ((Pizza)LB_PizzaOrBeverage.SelectedItem).PizzaID);
+
+                            //changing details
+                                try
+                                {
+                                    pizza.Name = TB_Name.Text;
+                                }
+                                catch (Exception ex)
+                                {
+                                    MessageBox.Show(ex.Message);
+                                    return;
+                                }
                                 
-                                //changing details
-                                pizza.Name = TB_Name.Text;
                                 pizza.Price = Price;
                                 pizza.SizeID = ((Sizes)CB_Sizes.SelectedItem).SizeID;
                                 //changing ingredients
@@ -325,7 +344,7 @@ namespace Pizzeria.AppWindows
                                     {
                                         pizza.IngredientsGroup.Add(new IngredientsGroup(Lb_Ingredient.IngredientID, pizza.PizzaID));
                                         pizza.Price = Price;
-                                        MessageBox.Show($"Ingredient to add {Lb_Ingredient} to pizza {pizza}");
+                                       // MessageBox.Show($"Ingredient to add {Lb_Ingredient} to pizza {pizza}");
                                     }
 
                                 }
@@ -350,7 +369,7 @@ namespace Pizzeria.AppWindows
                                             IngredientsGroup toRemoveIngredient = db.IngredientsGroup
                                                 .Include(ingredientGroup => ingredientGroup.Ingredient)
                                                 .FirstOrDefault(ingredientsGroup => ingredientsGroup.PizzaID == pizza.PizzaID && ingredientsGroup.Ingredient.IngredientID == PizzaIngredientsGroup.IngredientID);
-                                            MessageBox.Show($"Ingredient to remove {toRemoveIngredient.Ingredient} from pizza {pizza} with ingredientID {toRemoveIngredient.IngredientID} and pizzaID {toRemoveIngredient.PizzaID}");
+                                           // MessageBox.Show($"Ingredient to remove {toRemoveIngredient.Ingredient} from pizza {pizza} with ingredientID {toRemoveIngredient.IngredientID} and pizzaID {toRemoveIngredient.PizzaID}");
                                             pizza.IngredientsGroup.Remove(toRemoveIngredient);
                                         }
                                     }
@@ -366,9 +385,7 @@ namespace Pizzeria.AppWindows
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show($"Error saving pizza details");
-                            File.WriteAllText("error.txt", ex.ToString());
-
+                            AppUtilities.ShowError(ex, "Error saving pizza details");
                         }
                     }
                     LB_Ingredients.SelectedItems.Clear();
@@ -376,7 +393,10 @@ namespace Pizzeria.AppWindows
                     BTN_Undo.IsEnabled = false;
                     BTN_Create.IsEnabled = true;
                     BTN_Create.Content = "Create Pizza";
-                    TB_Price.IsEnabled = false;
+                    if (RB_Beverage.IsChecked == true)
+                        TB_Price.IsEnabled = true;
+                    else
+                        TB_Price.IsEnabled = false;
                     LB_Ingredients.IsEnabled = true;
                     TB_Name.Text = "Pizza Name";
                     LB_PizzaOrBeverage.IsEnabled = true;
@@ -387,8 +407,8 @@ namespace Pizzeria.AppWindows
 
                 }
 
-                Beverage beverage;
-                if (String.Equals(BTN_Edit.Content, "Edit Beverage"))
+            Beverage beverage;
+            if (String.Equals(BTN_Edit.Content, "Edit Beverage"))
                 {
                     if (LB_PizzaOrBeverage.SelectedItem != null)
                     {
@@ -419,8 +439,7 @@ namespace Pizzeria.AppWindows
                             }
                             catch (Exception ex)
                             {
-                                MessageBox.Show($"Error retriving pizza details");
-                                File.WriteAllText("error.txt", ex.ToString());
+                                AppUtilities.ShowError(ex, "Error retriving pizza details");
                             }
                         }
 
@@ -428,50 +447,51 @@ namespace Pizzeria.AppWindows
                     }
 
                 }
-                else if(String.Equals(BTN_Edit.Content, "Save Beverage"))
+            else if(String.Equals(BTN_Edit.Content, "Save Beverage"))
+            {
+                //on save
+                using (PizzeriaDBContext db = new PizzeriaDBContext())
                 {
-                    //on save
-                    using (PizzeriaDBContext db = new PizzeriaDBContext())
+                    try
                     {
-                        try
-                        {
-                            beverage = db.Beverages
-                            .FirstOrDefault(beverage => beverage.BeverageID == ((Beverage)LB_PizzaOrBeverage.SelectedItem).BeverageID);
-                            ;
+                        beverage = db.Beverages
+                        .FirstOrDefault(beverage => beverage.BeverageID == ((Beverage)LB_PizzaOrBeverage.SelectedItem).BeverageID);
 
-                            if(String.IsNullOrEmpty(TB_Name.Text) == false)
-                            {
-                                if (double.TryParse(TB_Price.Text.Split()[0], out double result))
-                                {
-                                    beverage.Name = TB_Name.Text;
-                                    beverage.Price = result;
-                                    db.SaveChanges();
-                                    AppUtilities.LoadLBBeverages(LB_PizzaOrBeverage, BeverageList);
-                                    MessageBox.Show("Beverage saved succesfuly.");
-                                } else MessageBox.Show("Invalid Price");
-
-                            }
-                            else MessageBox.Show($"Invalid name");
+                        try{
+                            beverage.Name = TB_Name.Text;
                         }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"Error saving beverage details");
-                            File.WriteAllText("error.txt", ex.ToString());
-
+                        catch (Exception ex) { 
+                            MessageBox.Show(ex.Message); 
+                            return; 
                         }
+
+                        if (double.TryParse(TB_Price.Text.Split()[0], out double result))
+                        {
+                            beverage.Price = result;
+                            db.SaveChanges();
+                            AppUtilities.LoadLBBeverages(LB_PizzaOrBeverage, BeverageList);
+                            MessageBox.Show("Beverage saved succesfuly.");
+                        }
+                        else MessageBox.Show("Invalid Price");
+                     
                     }
-                    BTN_Edit.Content = "Edit Beverage";
-                    BTN_Undo.IsEnabled = false;
-                    BTN_Create.IsEnabled = true;
-                    BTN_Create.Content = "Create Beverage";
-                    TB_Price.IsEnabled = false;
-                    TB_Name.Text = "Beverage Name";
-                    LB_PizzaOrBeverage.IsEnabled = true;
-                    RB_Pizza.IsEnabled = true;
-                    RB_CustomPizza.IsEnabled = true;
-                    RB_Beverage.IsEnabled = true;
-                    BTN_Pizza.IsEnabled = true;
-
+                    catch (Exception ex)
+                    {
+                        AppUtilities.ShowError(ex, "Error saving beverage details");
+                    }
+                }
+                BTN_Edit.Content = "Edit Beverage";
+                BTN_Undo.IsEnabled = false;
+                BTN_Create.IsEnabled = true;
+                BTN_Create.Content = "Create Beverage";
+                TB_Price.IsEnabled = false;
+                TB_Name.Text = "Beverage Name";
+                LB_PizzaOrBeverage.IsEnabled = true;
+                RB_Pizza.IsEnabled = true;
+                RB_CustomPizza.IsEnabled = true;
+                RB_Beverage.IsEnabled = true;
+                BTN_Pizza.IsEnabled = true;
+                
             }
 
         }
@@ -498,8 +518,7 @@ namespace Pizzeria.AppWindows
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Error retriving pizza details");
-                        File.WriteAllText("error.txt", ex.ToString());
+                        AppUtilities.ShowError(ex, "Error retriving pizza details");
                     }
                 }
             }
@@ -517,8 +536,7 @@ namespace Pizzeria.AppWindows
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Error retriving pizza details");
-                        File.WriteAllText("error.txt", ex.ToString());
+                        AppUtilities.ShowError(ex, "Error retriving pizza details");
                     }
                 }
             }
