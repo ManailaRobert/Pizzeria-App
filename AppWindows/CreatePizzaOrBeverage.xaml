@@ -13,7 +13,7 @@
             <StackPanel Margin="0,5,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
                 <Label Foreground="White" VerticalAlignment="Center">Product type: </Label>
                 <RadioButton x:Name="RB_Pizza" VerticalAlignment="Center" Checked="RB_Pizza_Checked" Foreground="White" Margin="10,0,0,0" IsChecked="False">Pizza</RadioButton>
-                <RadioButton Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0" Checked="RB_Beverage_Checked" >Beverage</RadioButton>
+                <RadioButton x:Name="RB_Beverage" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0" Checked="RB_Beverage_Checked" >Beverage</RadioButton>
                 <RadioButton x:Name="RB_CustomPizza" Foreground="White" VerticalAlignment="Center"  Margin="10,0,0,0" Checked="RB_CustomPizza_Checked">Custom Pizza</RadioButton>
             </StackPanel>
             <TextBox x:Name="TB_Name" Margin="0,5,0,0" Height="18">Pizza Name</TextBox>
@@ -33,7 +33,11 @@
                 <Button x:Name="BTN_Beverage" Width="171" Click="BTN_Beverage_Click">Beverage</Button>
             </StackPanel>
             <ListBox x:Name="LB_PizzaOrBeverage" Height="251"></ListBox>
-            <Button Margin="0,15,0,0" Width="96">Edit</Button>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button x:Name="BTN_Edit" Margin="0,15,0,0" Width="96" Click="BTN_Edit_Click" Content="Edit Pizza"/>
+                <Button x:Name="BTN_Undo" Margin="10,15,0,0" Width="96" Click="BTN_Undo_Click" IsEnabled="False">Undo</Button>
+            </StackPanel>
+           
         </StackPanel>
     </Grid>
 </Page>

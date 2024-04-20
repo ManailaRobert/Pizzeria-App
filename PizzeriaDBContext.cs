@@ -14,7 +14,7 @@ namespace Pizzeria
         public DbSet<Pizza> Pizza { get; set; }
         public DbSet<Adress> Adresses { get; set; }
         public DbSet<Beverage> Beverages { get; set; }
-        public DbSet<Customer> Customers { get; set; }
+        public DbSet<Customers> Customers { get; set; }
         public DbSet<Ingredient> Ingredients { get; set;}
         public DbSet<IngredientsGroup> IngredientsGroup { get; set; }
         public DbSet<OrderBeverage> OrderBeverage { get; set; }
@@ -33,12 +33,12 @@ namespace Pizzeria
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //Customer Relationship -> not tested
-            modelBuilder.Entity<Customer>().HasKey(a => a.CustomerID);
-            modelBuilder.Entity<Customer>()
+            modelBuilder.Entity<Customers>().HasKey(a => a.CustomerID);
+            modelBuilder.Entity<Customers>()
                     .HasMany(a => a.Adresses)
                     .WithOne(b => b.Customer)
                     .HasForeignKey(c => c.CustomerID);
-            modelBuilder.Entity<Customer>()
+            modelBuilder.Entity<Customers>()
                     .HasMany(a => a.Orders)
                     .WithOne(b => b.Customer)
                     .HasForeignKey(c => c.CustomerID);
@@ -66,14 +66,18 @@ namespace Pizzeria
                 .WithMany(b => b.OrderPizza)
                 .HasForeignKey(c => c.OrderID);
 
-            //pizza Relationship 
+            //pizza Relationship ----------------------------------------------
             modelBuilder.Entity<Pizza>().HasKey(a => a.PizzaID);
             modelBuilder.Entity<Pizza>()
                 .HasOne(a => a.Size)
-                .WithOne(b=> b.Pizza)
-                .HasForeignKey<Pizza>(c => c.SizeID);
+                .WithMany(b=> b.Pizzas)
+                .HasForeignKey(c => c.SizeID);
             //Sizes relationship
             modelBuilder.Entity<Sizes>().HasKey(a => a.SizeID);
+            modelBuilder.Entity<Sizes>()
+                .HasMany(a => a.Pizzas)
+                .WithOne(b => b.Size)
+                .HasForeignKey(c => c.SizeID);
 
             //IngredientsGroup relationships
             modelBuilder.Entity<IngredientsGroup>().HasKey(a => a.IngredientsGroupID);
@@ -94,7 +98,7 @@ namespace Pizzeria
                 .WithOne(b => b.Ingredient)
                 .HasForeignKey(c => c.IngredientID);
 
-            //Adress relationship -> not tested
+            //Adress relationship -> not tested-------------------------------------------------
             modelBuilder.Entity<Adress>().HasKey(a => a.AdressID);
 
             //Order Relationship -> not tested
