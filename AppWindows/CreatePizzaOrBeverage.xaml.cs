@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace Pizzeria.AppWindows
 {
@@ -24,20 +25,48 @@ namespace Pizzeria.AppWindows
     /// </summary>
     public partial class CreatePizzaOrBeverage : Page
     {
-        public CreatePizzaOrBeverage()
+
+        private MainWindow mainWindow;
+        private OrderWindow OrderWindow;
+        private List<Ingredient> IngredientsLoadList;
+        private List<Ingredient> IngredientsList;
+        private double Price;
+        private List<Sizes> SizesList;
+        private List<Pizza> PizzaList;
+        private List<Beverage> BeverageList;
+        private Cart Cart;
+        private string pizzaType;
+
+        public CreatePizzaOrBeverage(Cart cart = null,string PizzaType = "nu", MainWindow main = null, OrderWindow orderWindow = null)
         {
             InitializeComponent();
             RB_Pizza.IsChecked = true;
+            pizzaType = PizzaType;
+            if(string.Equals(pizzaType, "da")) {// on creat pizza from orders
+                mainWindow = main;
+                OrderWindow = orderWindow;
+                Cart = cart;
+                BTN_Back.Visibility = Visibility.Visible;
+                BTN_Pizza.IsEnabled = false;
+                BTN_Edit.IsEnabled = false;
+                RB_CustomPizza.IsChecked = true;
+                RB_Beverage.IsEnabled = false;
+                RB_Pizza.IsEnabled = false;
+                BTN_Beverage.IsEnabled = false;
+                LB_PizzaOrBeverage.IsEnabled = false;
+            }
+            else BTN_Back.Visibility = Visibility.Hidden;
+
 
             AppUtilities.LoadLBBeverages(LB_PizzaOrBeverage, BeverageList);
             AppUtilities.LoadLBPizza(LB_PizzaOrBeverage, PizzaList);
+            AppUtilities.LoadCBSizes(CB_Sizes,SizesList);
             using (var db = new PizzeriaDBContext())
             {
                 try
                 {
                     IngredientsLoadList = db.Ingredients.ToList();
                     LB_Ingredients.ItemsSource = IngredientsLoadList;
-                    LB_Ingredients.SelectedItem = LB_Ingredients.Items[0];
                     //MessageBox.Show("Loaded Ingredients");
                 }
                 catch (Exception ex)
@@ -45,30 +74,8 @@ namespace Pizzeria.AppWindows
                     AppUtilities.ShowError(ex,"Error loading Ingredients");
                 }
 
-                try
-                {
-                    SizesList = db.Sizes.ToList();
-                    CB_Sizes.ItemsSource = SizesList;
-                    CB_Sizes.SelectedItem = CB_Sizes.Items[0];
-
-                    //MessageBox.Show("Loaded Ingredients");
-                }
-                catch (Exception ex)
-                {
-                    AppUtilities.ShowError(ex, "Error loading Sizes");
-                }
-
-
             }
         }
-        private List<Ingredient> IngredientsLoadList;
-        private List<Ingredient> IngredientsList;
-        private double Price ;
-        private List<Sizes> SizesList;
-        private List<Pizza> PizzaList;
-        private List<Beverage> BeverageList;
-
-
         private void RB_Pizza_Checked(object sender, RoutedEventArgs e)
         {
             BTN_Create.Content = "Create Pizza";
@@ -153,59 +160,89 @@ namespace Pizzeria.AppWindows
             CalculatePrice();
         }
 
+        private void CreatePizza(out Pizza CreatedPizza)
+        {
+            CreatedPizza = null;
+            using (PizzeriaDBContext db = new PizzeriaDBContext())
+            {
+                try
+                {
+                    if (IngredientsList.Count > 0)
+                    {
+                        Pizza pizza;
+                        try
+                        {
+                            string PizzaName = TB_Name.Text;
+                            int sizeID = ((Sizes)CB_Sizes.SelectedItem).SizeID;
+                            string custom = RB_CustomPizza.IsChecked == true ? "da" : "nu";
+                            pizza = new Pizza(PizzaName, Price, sizeID, custom);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
+                            return ;
+                        }
+                        db.Pizza.Add(pizza);
+                        db.SaveChanges();
+
+                        //get last pizza inserted
+                        Pizza newPizza = db.Pizza
+                            .Include(pizza => pizza.IngredientsGroup)
+                            .FirstOrDefault(pizzaFromDB => pizzaFromDB.PizzaID == pizza.PizzaID);
+
+                        // add ingredients to last pizza inserted
+                        foreach (Ingredient ingredient in IngredientsList)
+                            pizza.IngredientsGroup.Add(new IngredientsGroup(ingredient.IngredientID, pizza.PizzaID));
+
+                        db.SaveChanges();
+
+                        if (BTN_Pizza.IsEnabled == false)
+                            AppUtilities.LoadLBPizza(LB_PizzaOrBeverage, PizzaList);
+
+                        if (string.Equals(BTN_Edit.Content, "Save Pizza"))
+                        {
+                            BTN_Undo.IsEnabled = false;
+                            BTN_Edit.Content = "Edit Pizza";
+                            LB_PizzaOrBeverage.IsEnabled = true;
+                            BTN_Beverage.IsEnabled = true;
+                            RB_Beverage.IsEnabled = true;
+                            RB_CustomPizza.IsEnabled = true;
+                            RB_Pizza.IsEnabled = true;
+                        }
+                        MessageBox.Show("Pizza created");
+
+                        if (string.Equals(pizzaType, "da"))
+                        {
+                            try{
+                                pizza = db.Pizza
+                                    .Include(s => s.Size)
+                                    .FirstOrDefault(p => p.PizzaID == pizza.PizzaID);
+                                Cart.Add(pizza);
+                                AppUtilities.LoadLBCart(OrderWindow.LB_Cart, Cart);
+                                OrderWindow.TB_TotalPrice.Text = $"{Cart.cartPrice} RON";
+                            }catch (Exception ex)
+                            {
+                                AppUtilities.ShowError(ex, "Something went wrong when adding custom pizza to cart.");
+                            }
+                        }
+
+                    }
+                    else MessageBox.Show("Insuficient ingredients");
+
+                }
+                catch (Exception ex)
+                {
+                    AppUtilities.ShowError(ex, "Error adding pizza");
+                }
+            }
+        }
         private void BTN_Create_Click(object sender, RoutedEventArgs e)
         {
             if (RB_Pizza.IsChecked == true || RB_CustomPizza.IsChecked == true)
             {
                 //pizza create
-                using (PizzeriaDBContext db = new PizzeriaDBContext())
-                { 
-                    try
-                    {
-                        if(IngredientsList.Count > 0)
-                        {
-                            Pizza pizza;
-                            try
-                            {
-                                string PizzaName = TB_Name.Text;
-                                int sizeID = ((Sizes)CB_Sizes.SelectedItem).SizeID;
-                                string custom = RB_CustomPizza.IsChecked == true ? "da" : "nu";
-                                pizza = new Pizza(PizzaName, Price, sizeID, custom);
-                            }
-                            catch (Exception ex)
-                            { 
-                                MessageBox.Show(ex.Message);
-                                return; 
-                            }
-                            db.Pizza.Add(pizza);
-                            db.SaveChanges();
-
-                            //get last pizza inserted
-                            Pizza newPizza = db.Pizza
-                                .Include(pizza => pizza.IngredientsGroup)
-                                .FirstOrDefault(pizzaFromDB => pizzaFromDB.PizzaID == pizza.PizzaID);
-
-                            // add ingredients to last pizza inserted
-                            foreach (Ingredient ingredient in IngredientsList)
-                                pizza.IngredientsGroup.Add(new IngredientsGroup(ingredient.IngredientID, pizza.PizzaID));
-
-                            db.SaveChanges();
-
-                            if (BTN_Pizza.IsEnabled == false)
-                                AppUtilities.LoadLBPizza(LB_PizzaOrBeverage, PizzaList);
-                            IngredientsList.Clear();
-                            LB_Ingredients.SelectedItems.Clear();
-                            MessageBox.Show("Pizza created");
-
-                        }
-                        else MessageBox.Show("Insuficient ingredients");
-
-                    }
-                    catch (Exception ex)
-                    {
-                        AppUtilities.ShowError(ex, "Error adding pizza");
-                    }
-                }
+                Pizza CreatedPizza;
+                CreatePizza(out CreatedPizza);
             }
             else
             {
@@ -264,7 +301,7 @@ namespace Pizzeria.AppWindows
                         RB_CustomPizza.IsEnabled = false;
                         RB_Beverage.IsEnabled = false;
                         BTN_Edit.Content = "Save Pizza"; // on edit
-                        BTN_Create.IsEnabled = false;
+                        //BTN_Create.IsEnabled = false;
                         LB_PizzaOrBeverage.IsEnabled = false;
                         BTN_Beverage.IsEnabled = false;
                         TB_Price.IsEnabled = false;
@@ -540,6 +577,16 @@ namespace Pizzeria.AppWindows
                     }
                 }
             }
+        }
+
+        private void BTN_Back_Click(object sender, RoutedEventArgs e)
+        {
+            mainWindow.Main.GoBack();  
+        }
+
+        private void BTN_ClearIngredients_Click(object sender, RoutedEventArgs e)
+        {
+            LB_Ingredients.SelectedItems.Clear();
         }
     }
 }

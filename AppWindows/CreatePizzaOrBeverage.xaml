@@ -9,6 +9,9 @@
       Title="CreatePizzaOrBeverage">
 
     <Grid >
+        <StackPanel Margin="10,0,795,415">
+            <Button x:Name="BTN_Back" Click="BTN_Back_Click" Content="Back"/>
+        </StackPanel>
         <StackPanel Margin="80,18,474,14">
             <StackPanel Margin="0,5,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
                 <Label Foreground="White" VerticalAlignment="Center">Product type: </Label>
@@ -17,8 +20,12 @@
                 <RadioButton x:Name="RB_CustomPizza" Foreground="White" VerticalAlignment="Center"  Margin="10,0,0,0" Checked="RB_CustomPizza_Checked">Custom Pizza</RadioButton>
             </StackPanel>
             <TextBox x:Name="TB_Name" Margin="0,5,0,0" Height="18">Pizza Name</TextBox>
-            <Label Margin="0,15,0,0" Foreground="White" Height="26">Ingredient List</Label>
-            <ListBox x:Name="LB_Ingredients" Height="200" d:ItemsSource="{d:SampleData ItemCount=5}" SelectedIndex="0" SelectionMode="Multiple" SelectionChanged="LB_Ingredients_SelectionChanged" ></ListBox>
+            <StackPanel Orientation="Horizontal">
+                <Label Margin="0,15,0,0" Foreground="White" Height="26">Ingredient List</Label>
+                <StackPanel Width="137"></StackPanel>
+                <Button x:Name="BTN_ClearIngredients" Width="120" Margin="0,10,0,0" Click="BTN_ClearIngredients_Click" Height="20" HorizontalContentAlignment="Center" VerticalAlignment="Bottom" Content="Clear Ingredients" HorizontalAlignment="Right"/>
+            </StackPanel>
+            <ListBox x:Name="LB_Ingredients" Height="200" d:ItemsSource="{d:SampleData ItemCount=5}" SelectionMode="Multiple" SelectionChanged="LB_Ingredients_SelectionChanged" />
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
                 <Label Foreground="White">Size:</Label>
                 <ComboBox x:Name="CB_Sizes" Width="120" Margin="5,0,20,0" Height="20" SelectionChanged="CB_Sizes_SelectionChanged"></ComboBox>

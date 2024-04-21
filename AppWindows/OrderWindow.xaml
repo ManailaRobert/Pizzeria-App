@@ -9,41 +9,49 @@
       Title="OrderWindow">
 
     <Grid Height="433">
-        <StackPanel x:Name="Left" Margin="94,39,605,51" Width="197">
+        <StackPanel x:Name="Left" Margin="82,39,594,51" Width="220">
             <StackPanel Orientation="Horizontal">
-                <Button x:Name="BTN_Pizza" Content="Pizza" HorizontalAlignment="Left"  VerticalAlignment="Top" RenderTransformOrigin="0.49,-0.501" Width="98" Height="20" Click="BTN_Pizza_Click" IsEnabled="False"/>
-                <Button x:Name="BTN_Beverage" Content="Beverage"  VerticalAlignment="Top" RenderTransformOrigin="0.49,-0.501" Width="99" Height="20" BorderBrush="#FF9A9A9A" Click="BTN_Beverage_Click"/>
+                <Button x:Name="BTN_Pizza" Content="Pizza" HorizontalAlignment="Left"  VerticalAlignment="Top" RenderTransformOrigin="0.49,-0.501" Width="110" Height="20" Click="BTN_Pizza_Click" IsEnabled="False"/>
+                <Button x:Name="BTN_Beverage" Content="Beverage"  VerticalAlignment="Top" RenderTransformOrigin="0.49,-0.501" Width="110" Height="20" BorderBrush="#FF9A9A9A" Click="BTN_Beverage_Click"/>
             </StackPanel>
-            <ListBox d:ItemsSource="{d:SampleData ItemCount=5}" Height="251" />
-            <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
+            <StackPanel>
+                <ListBox x:Name="LB_PizzaOrBeverage" d:ItemsSource="{d:SampleData ItemCount=5}" Height="251" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center" Width="217">
                 <Label Content="Size" HorizontalAlignment="Left"  VerticalAlignment="Top" Foreground="White"/>
-                <ComboBox  VerticalAlignment="Center" Width="160"/>
+                <ComboBox x:Name="CB_Sizes"  VerticalAlignment="Center" Width="160" SelectionChanged="CB_Sizes_SelectionChanged"/>
             </StackPanel>
-            <Button Content="Add" Margin="0,10,0,0" RenderTransformOrigin="0.49,-0.501" Width="60"/>
+            <StackPanel Margin="0,10,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button x:Name="BTN_AddToCart" Content="Add"  RenderTransformOrigin="0.49,-0.501" Width="60" Click="BTN_AddToCart_Click" />
+                <Button x:Name="BTN_Create"  Margin="10,0,0,0" Click="BTN_Create_Click">Create Pizza</Button>
+            </StackPanel>
         </StackPanel>
 
         <StackPanel x:Name="Middle" Margin="304,39,304,51" Width="193">
             <TextBox Text="Clients" TextAlignment="Center" IsEnabled="False" Height="20" />
-            <ListBox d:ItemsSource="{d:SampleData ItemCount=5}" Height="251"/>
+            <ListBox x:Name="LB_Clients" d:ItemsSource="{d:SampleData ItemCount=5}" Height="251" SelectionChanged="LB_Clients_SelectionChanged"/>
             <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
                 <Label Content="Adress" HorizontalAlignment="Left"  VerticalAlignment="Top" Foreground="White"/>
-                <ComboBox  VerticalAlignment="Center" Width="147" HorizontalAlignment="Center"/>
+                <ComboBox x:Name="CB_Adresses"  VerticalAlignment="Center" Width="147" HorizontalAlignment="Center"/>
             </StackPanel>
         </StackPanel>
 
 
-        <StackPanel x:Name="Right" Margin="558,39,46,39" Width="196">
-            <TextBox HorizontalAlignment="Left" TextWrapping="Wrap" Text="Order" VerticalAlignment="Top" Width="196" IsEnabled="False" TextAlignment="Center" Height="20"/>
-            <ListBox d:ItemsSource="{d:SampleData ItemCount=5}" Width="196" Height="231"/>
-            <TextBox HorizontalAlignment="Left" TextWrapping="Wrap" Text="Total Price:" VerticalAlignment="Top" Width="196" IsEnabled="False" TextAlignment="Right" Height="20"/>
+        <StackPanel x:Name="Right" Margin="558,39,46,39" Width="220">
+            <TextBox HorizontalAlignment="Left" TextWrapping="Wrap" Text="Order" VerticalAlignment="Top" Width="220" IsEnabled="False" TextAlignment="Center" Height="20"/>
+            <ListBox x:Name="LB_Cart" d:ItemsSource="{d:SampleData ItemCount=5}" Width="220" Height="231"/>
+            <TextBox x:Name="TB_TotalPrice" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Total Price:" VerticalAlignment="Top" Width="220" IsEnabled="False" TextAlignment="Right" Height="20"/>
             <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                 <StackPanel Width="112" HorizontalAlignment="Left" Height="75">
-                    <CheckBox Content="Receipt" HorizontalAlignment="Center"  VerticalAlignment="Top" Foreground="White"/>
+                    <CheckBox x:Name="CB_Receipt" Content="Receipt" HorizontalAlignment="Center"  VerticalAlignment="Top" Foreground="White"/>
                     <Label Content="Payment Method:" HorizontalAlignment="Left"  VerticalAlignment="Top" Foreground="White"/>
-                    <RadioButton Content="Card" HorizontalAlignment="Center"  VerticalAlignment="Top" Foreground="White"/>
-                    <RadioButton Content="Cash" HorizontalAlignment="Center"  VerticalAlignment="Top" Foreground="White"/>
+                    <RadioButton x:Name="RB_Card" Content="Card" HorizontalAlignment="Center"  VerticalAlignment="Top" Foreground="White"/>
+                    <RadioButton x:Name="RB_Cash" Content="Cash" HorizontalAlignment="Center"  VerticalAlignment="Top" Foreground="White"/>
                 </StackPanel>
-                <Button Content="Place Order" Height="36" Width="70"/>
+                <StackPanel>
+                    <Button x:Name="BTN_PlaceOrder" Content="Place Order" Height="36" Width="70" Click="BTN_PlaceOrder_Click"/>
+                    <Button x:Name="BTN_ClearCart" Margin="0,10,0,0" Click="BTN_ClearCart_Click">Clear Cart</Button>
+                </StackPanel>
             </StackPanel>
         </StackPanel>
     </Grid>

@@ -25,7 +25,7 @@ namespace Pizzeria
         object previousPage;
         private void BTN_Order_Click(object sender, RoutedEventArgs e)
         {
-            Main.Content = new OrderWindow();
+            Main.Content = new OrderWindow(this);
             Main.NavigationService.RemoveBackEntry();
         }
 

@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.IO;
 using System.Windows;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.Design;
 
 namespace Pizzeria
 {
@@ -16,11 +17,20 @@ namespace Pizzeria
         public static void ShowError(Exception ex, string message)
         {
             MessageBox.Show(message);
-            File.WriteAllText("error.txt", ex.ToString());
+            File.WriteAllText("error.txt", $"{ex.ToString()}");
         }
-        public static void LoadLBPizza (ListBox lb, List<Pizza> PizzaList)
+        public static string  LineCreator(int size)
         {
-            PizzaList = AppUtilities.LoadPizzaList();
+            string str = "";
+
+            for (int i = 0; i <= size + 4; i++)
+                str += "-";
+            return str;
+        }
+        public static void LoadLBPizza (ListBox lb, List<Pizza> PizzaList,int type = 0,int sizeID = -1)
+        {
+            // type = 0 all pizzas
+            PizzaList = LoadPizzaList(type,sizeID);
             lb.ItemsSource = PizzaList;
         }
 
@@ -32,7 +42,7 @@ namespace Pizzeria
        
         public static void LoadLBCustomers(ListBox lb, List<Customers> CustomersList)
         {
-            CustomersList = AppUtilities.LoadCustomersList();
+            CustomersList = LoadCustomersList();
             lb.ItemsSource = CustomersList;
         }
         public static void LoadCBAdresses(ComboBox cb, List<Adress> AdressList, int id)
@@ -42,18 +52,80 @@ namespace Pizzeria
             cb.SelectedIndex = 0;
         }
         
-        private static List<Pizza> LoadPizzaList()
+        public static void LoadCBSizes(ComboBox cb, List<Sizes> SizeList)
+        {
+            SizeList = LoadSizesList();
+            cb.ItemsSource = SizeList;
+            cb.SelectedIndex = 0;
+        }
+
+        public static void LoadLBCart(ListBox lb, Cart CartList)
+        {
+            lb.ItemsSource= CartList.ToList();
+        }
+
+        private static List<Sizes> LoadSizesList()
+        {
+            List<Sizes> sizes = new List<Sizes>();
+            using (PizzeriaDBContext db = new PizzeriaDBContext())
+            {
+                try
+                {
+                   sizes = db.Sizes.ToList();
+                }
+                catch(Exception ex)
+                {
+                    ShowError(ex,"Error Loading Sizes");
+
+                }
+            }
+            return sizes;
+        }
+        private static List<Pizza> LoadPizzaList(int type,int sizeId)
         {
             List<Pizza> PizzaList = new List<Pizza>();
             using (PizzeriaDBContext dB = new PizzeriaDBContext())
             {
                 try
                 {
-                    PizzaList = dB.Pizza
-                        .Include(pizza => pizza.Size)
-                        .Include(pizza => pizza.IngredientsGroup)
-                        .ThenInclude(ingredientsGroup => ingredientsGroup.Ingredient)
-                        .ToList();
+                    if(type == 0)
+                    {
+                        //custom and normal pizza
+                        PizzaList = dB.Pizza
+                            .Include(pizza => pizza.Size)
+                            .Include(pizza => pizza.IngredientsGroup)
+                            .ThenInclude(ingredientsGroup => ingredientsGroup.Ingredient)
+                            .ToList();
+
+                    }
+                    else if(type == 1)
+                    {
+                        //normal pizza
+                        if (sizeId == -1)
+                            PizzaList = dB.Pizza
+                                .Include(pizza => pizza.Size)
+                                .Include(pizza => pizza.IngredientsGroup)
+                                .ThenInclude(ingredientsGroup => ingredientsGroup.Ingredient)
+                                .Where(pizza => string.Equals(pizza.Custom, "nu"))
+                                .ToList();
+                        else PizzaList = dB.Pizza
+                            .Include(pizza => pizza.Size)
+                            .Include(pizza => pizza.IngredientsGroup)
+                            .ThenInclude(ingredientsGroup => ingredientsGroup.Ingredient)
+                            .Where(pizza => pizza.SizeID == sizeId)
+                            .ToList();
+                    }
+                    else
+                    {
+                        //custom pizza
+                        PizzaList = dB.Pizza
+                            .Include(pizza => pizza.Size)
+                            .Include(pizza => pizza.IngredientsGroup)
+                            .ThenInclude(ingredientsGroup => ingredientsGroup.Ingredient)
+                            .Where(pizza => string.Equals(pizza.Custom, "da"))
+                            .ToList();
+                    }
+
                     //MessageBox.Show("Pizza list loaded");
                 }
                 catch (Exception ex)

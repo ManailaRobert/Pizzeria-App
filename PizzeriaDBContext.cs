@@ -32,37 +32,30 @@ namespace Pizzeria
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //Customer Relationship -> not tested
+            //Customer Relationship 
             modelBuilder.Entity<Customers>().HasKey(a => a.CustomerID);
             modelBuilder.Entity<Customers>()
                     .HasMany(a => a.Adresses)
                     .WithOne(b => b.Customer)
                     .HasForeignKey(c => c.CustomerID);
             modelBuilder.Entity<Customers>()
-                    .HasMany(a => a.Orders)
+                    .HasMany(a => a.CustomerOrders)
                     .WithOne(b => b.Customer)
                     .HasForeignKey(c => c.CustomerID);
-            //Adress relationship -> not tested
+
+            //Adress relationship 
             modelBuilder.Entity<Adress>().HasKey(a => a.AdressID);
             modelBuilder.Entity<Adress>()
                 .HasOne(a => a.Customer)
                 .WithMany(b=> b.Adresses)
                 .HasForeignKey(c => c.CustomerID);
+            modelBuilder.Entity<Adress>()
+                .HasMany(a=> a.Orders)
+                .WithOne(b => b.Adress)
+                .HasForeignKey(c => c.AdressID);
 
-            //OrderBeverage relationship -> not tested
-            modelBuilder.Entity<OrderBeverage>().HasKey(a => a.OrderBeverageID);
-            modelBuilder.Entity<OrderBeverage>()
-                .HasOne(a => a.Order)
-                .WithMany(b => b.OrderBeverages)
-                .HasForeignKey(c => c.OrderID);
-            modelBuilder.Entity<OrderBeverage>()
-                .HasOne(a => a.Beverage)
-                .WithMany(b => b.OrderBeverages)
-                .HasForeignKey(c => c.BeverageID);
-
-            //OrderPizza relationship -> not tested
+            //OrderPizza relationship 
             modelBuilder.Entity<OrderPizza>().HasKey(a => a.OrderPizzaID);
-            
             modelBuilder.Entity<OrderPizza>()
                 .HasOne(a=>a.Pizza)
                 .WithMany(b => b.OrderPizza)
@@ -72,12 +65,17 @@ namespace Pizzeria
                 .WithMany(b => b.OrderPizza)
                 .HasForeignKey(c => c.OrderID);
 
-            //pizza Relationship ----------------------------------------------
+            //pizza Relationship 
             modelBuilder.Entity<Pizza>().HasKey(a => a.PizzaID);
             modelBuilder.Entity<Pizza>()
                 .HasOne(a => a.Size)
                 .WithMany(b=> b.Pizzas)
                 .HasForeignKey(c => c.SizeID);
+            modelBuilder.Entity<Pizza>()
+                .HasMany(a => a.OrderPizza)
+                .WithOne(b => b.Pizza)
+                .HasForeignKey(c => c.PizzaID);
+
             //Sizes relationship
             modelBuilder.Entity<Sizes>().HasKey(a => a.SizeID);
             modelBuilder.Entity<Sizes>()
@@ -91,7 +89,6 @@ namespace Pizzeria
                 .HasOne(a => a.Pizza)
                 .WithMany(b => b.IngredientsGroup)
                 .HasForeignKey(c => c.PizzaID);
-
             modelBuilder.Entity<IngredientsGroup>()
                 .HasOne(a => a.Ingredient)
                 .WithMany()
@@ -104,13 +101,38 @@ namespace Pizzeria
                 .WithOne(b => b.Ingredient)
                 .HasForeignKey(c => c.IngredientID);
 
+            //OrderBeverage relationship 
+            modelBuilder.Entity<OrderBeverage>().HasKey(a => a.OrderBeverageID);
+            modelBuilder.Entity<OrderBeverage>()
+                .HasOne(a => a.Order)
+                .WithMany(b => b.OrderBeverages)
+                .HasForeignKey(c => c.OrderID);
+            modelBuilder.Entity<OrderBeverage>()
+                .HasOne(a => a.Beverage)
+                .WithMany(b => b.OrderBeverages)
+                .HasForeignKey(c => c.BeverageID);
 
-
-            //Order Relationship -> not tested -------------------------------------------------
-            modelBuilder.Entity<Order>().HasKey(a => a.OrderID);
-            //BeverageRelationship -> not tested
+            //Beverage Relationship 
             modelBuilder.Entity<Beverage>().HasKey(a => a.BeverageID);
+            modelBuilder.Entity<Beverage>()
+                .HasMany(a => a.OrderBeverages)
+                .WithOne(b => b.Beverage)
+                .HasForeignKey(c => c.BeverageID);
 
+            //Order Relationship 
+            modelBuilder.Entity<Order>().HasKey(a => a.OrderID);
+            modelBuilder.Entity<Order>()
+                .HasOne(a => a.Customer)
+                .WithMany(b => b.CustomerOrders)
+                .HasForeignKey(c => c.CustomerID);
+            modelBuilder.Entity<Order>()
+                .HasOne(a => a.Adress)
+                .WithMany(b => b.Orders)
+                .HasForeignKey(c => c.AdressID);
+            modelBuilder.Entity<Order>()
+                 .HasMany(a => a.OrderPizza)
+                 .WithOne(b => b.Order)
+                 .HasForeignKey(c => c.PizzaID);
 
             base.OnModelCreating(modelBuilder);
 

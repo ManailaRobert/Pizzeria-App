@@ -227,6 +227,10 @@ namespace Pizzeria.AppWindows
                             TB_AddAdress.Visibility = Visibility.Hidden;
                             BTN_AddAdress.Visibility = Visibility.Hidden;
                             CB_Adresses.Visibility = Visibility.Visible;
+                            BTN_ShowAdressAdder.Visibility = Visibility.Visible;
+                            BTN_EditClient.IsEnabled = true;
+                            BTN_Cancel.Visibility = Visibility.Hidden;
+                            BTN_EditAdress.IsEnabled = true;
 
                         }
                         catch(Exception ex)
