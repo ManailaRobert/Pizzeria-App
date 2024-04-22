@@ -30,7 +30,15 @@ namespace Pizzeria.AppWindows
         {
             InitializeComponent();
             ordersList = AppUtilities.LoadLBOrders(0, LB_AllOrders, ordersList);
-            nrOfReports = Convert.ToInt32(File.ReadAllText("reportsMade.txt"));      
+            try
+            {
+                nrOfReports = Convert.ToInt32(File.ReadAllText("reportsMade.txt"));
+
+            }catch(Exception ex)
+            {
+                nrOfReports = 0;
+                File.WriteAllText("reportsMade.txt",nrOfReports.ToString());
+            }
         }
 
         private void LB_AllOrders_SelectionChanged(object sender, SelectionChangedEventArgs e)

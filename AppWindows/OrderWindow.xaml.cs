@@ -35,7 +35,7 @@ namespace Pizzeria.AppWindows
         {
             InitializeComponent();
             MainWindow = mainWindow;
-            AppUtilities.LoadLBPizza(LB_PizzaOrBeverage, PizzaList,1);//normal pizza
+            AppUtilities.LoadLBPizza(LB_PizzaOrBeverage, PizzaList,1,1);//normal pizza
             AppUtilities.LoadCBSizes(CB_Sizes, SizesList);
             AppUtilities.LoadLBCustomers(LB_Clients, CustomersList);
             cart = new Cart();
@@ -43,7 +43,8 @@ namespace Pizzeria.AppWindows
 
         private void BTN_Pizza_Click(object sender, RoutedEventArgs e)
         {
-            AppUtilities.LoadLBPizza(LB_PizzaOrBeverage, PizzaList);
+            int id = ((Sizes)CB_Sizes.SelectedItem).SizeID;
+            AppUtilities.LoadLBPizza(LB_PizzaOrBeverage, PizzaList,1,id);
             BTN_Pizza.IsEnabled = false;
             BTN_Beverage.IsEnabled = true;
             BTN_Create.IsEnabled = true;

@@ -25,10 +25,9 @@ namespace Pizzeria
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server=RobertsComputer;Database=PizzeriaDB;Integrated Security=True;TrustServerCertificate=true", sqlServerOptions => sqlServerOptions.EnableRetryOnFailure());
-            //optionsBuilder.UseSqlServer("Server=RobertsLaptop;Database=PizzeriaDB;Integrated Security=True;TrustServerCertificate=true", sqlServerOptions => sqlServerOptions.EnableRetryOnFailure());
+            //optionsBuilder.UseSqlServer("Server=RobertsComputer;Database=PizzeriaDB;Integrated Security=True;TrustServerCertificate=true", sqlServerOptions => sqlServerOptions.EnableRetryOnFailure());
+            optionsBuilder.UseSqlServer("Server=RobertsLaptop;Database=PizzeriaDB;Integrated Security=True;TrustServerCertificate=true", sqlServerOptions => sqlServerOptions.EnableRetryOnFailure());
 
-            
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
