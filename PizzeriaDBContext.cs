@@ -132,7 +132,7 @@ namespace Pizzeria
             modelBuilder.Entity<Order>()
                  .HasMany(a => a.OrderPizza)
                  .WithOne(b => b.Order)
-                 .HasForeignKey(c => c.PizzaID);
+                 .HasForeignKey(c => c.OrderID);
 
             base.OnModelCreating(modelBuilder);
 

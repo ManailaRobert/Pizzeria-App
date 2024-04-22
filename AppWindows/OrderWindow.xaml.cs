@@ -117,7 +117,7 @@ namespace Pizzeria.AppWindows
 
                                     string paymentMethod = RB_Card.IsChecked == true ? "card" : "numerar";
 
-                                    Order order = new Order(customer.CustomerID,adress.AdressID,paymentMethod);
+                                    Order order = new Order(customer.CustomerID,adress.AdressID,paymentMethod,cart.cartPrice,DateTime.Now,"active");
                                     db.Orders.Add(order);
                                     db.SaveChanges();
                                     foreach(Pizza pizza in cart.PizzasList)

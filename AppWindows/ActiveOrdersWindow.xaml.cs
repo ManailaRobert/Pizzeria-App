@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PizzeriaClasses;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,23 +21,10 @@ namespace Pizzeria.AppWindows
     /// </summary>
     public partial class Active_Orders_Window : Page
     {
-        public Active_Orders_Window()
-        {
-            InitializeComponent();
-        }
-        int n = 0;
 
-
-        private void DataSelected(object sender, SelectionChangedEventArgs e)
+        class CustomComboBox:ComboBox
         {
-            ComboBox comboBox = sender as ComboBox;
-            Status orderStatus = (Status)comboBox.SelectedItem;
-            if(orderStatus == Status.Delivered)
-            {
-                StackPanel cbParent = comboBox.Parent as StackPanel;
-                LB_ActiveOrders.Items.Remove(cbParent);
-                // change the status in DB to delivered
-            }
+            public int id;
         }
 
         private enum Status
@@ -47,45 +35,106 @@ namespace Pizzeria.AppWindows
             Delivering,
             Delivered
         }
-        private void BTN_Click(object sender, RoutedEventArgs e)
+        private List<Order> ActiveOrdersList = new List<Order>();
+
+        public Active_Orders_Window()
         {
-            TextBlock textBlock = new TextBlock();
-            StackPanel NewStackPanel = new StackPanel();
-            ComboBox comboBox = new ComboBox();
+            InitializeComponent();
 
 
-            //ComboBox Proprieties
-            comboBox.ItemsSource = Enum.GetValues(typeof(Status));
-            comboBox.SelectedItem = Status.Prepering;
-            comboBox.Width = 150;
-            comboBox.Height = 20;
-            comboBox.SelectionChanged += DataSelected;
-            comboBox.FontSize = 12;
+            ActiveOrdersList = AppUtilities.LoadLBOrders(1);// all orders
 
-            //StackPanel Proprieties
-            NewStackPanel.HorizontalAlignment = HorizontalAlignment.Center;
-            NewStackPanel.Orientation = Orientation.Horizontal;
-           
-            //TexttBlock Proprieties
-            n++;
-            textBlock.Text = $"Order ID {n}\n" +
-                "----------------\n" +
-                "Item 1\n" +
-                "Item 2\n" +
-                "Item 3\n" +
-                "----------------\n" +
-                "Total: 324 Lei";
-            textBlock.FontSize = 14;
+            foreach(Order order in ActiveOrdersList)
+            {
+                TextBlock textBlock = new TextBlock();
+                StackPanel NewStackPanel = new StackPanel();
+                CustomComboBox comboBox = new CustomComboBox();
+                comboBox.id = order.OrderID;
+                string pizzaList = "";
+                string beverageList = "";
+                string line = "";
+                int size = 0;
 
-            /*Adding the children
-             * hierarchy: 
-             * 0: LB_ActiveOrders
-             * 1: NewStackPanel
-             * 2: textBlock + comboBox  
-            */
-            NewStackPanel.Children.Add(textBlock);
-            NewStackPanel.Children.Add(comboBox);
-            LB_ActiveOrders.Items.Add(NewStackPanel);
+
+                //ComboBox Proprieties
+                comboBox.ItemsSource = Enum.GetValues(typeof(Status));
+                comboBox.SelectedItem = Status.Prepering;
+                comboBox.Width = 150;
+                comboBox.Height = 20;
+                comboBox.SelectionChanged += DataSelected;
+                comboBox.FontSize = 12;
+
+                //StackPanel Proprieties
+                NewStackPanel.HorizontalAlignment = HorizontalAlignment.Center;
+                NewStackPanel.Orientation = Orientation.Horizontal;
+
+                //TexttBlock Proprieties
+                foreach (OrderPizza orderPizza in order.OrderPizza)
+                {
+                    if (orderPizza.Pizza.ToString().Length > size)
+                        size = orderPizza.Pizza.ToString().Length;
+
+                    pizzaList += $"{orderPizza.Pizza}\n";
+                }
+                foreach (OrderBeverage orderBeverage in order.OrderBeverages)
+                {
+                    if (orderBeverage.Beverage.ToString().Length > size)
+                        size = orderBeverage.Beverage.ToString().Length;
+
+                    beverageList += $"{orderBeverage.Beverage}\n";
+                }
+                line += AppUtilities.LineCreator(size);
+                line += "\n";
+                textBlock.Text = line + 
+                    $"Order ID: {order.OrderID}\n" +
+                    line+
+                    pizzaList+
+                    beverageList+
+                    line;
+
+
+                textBlock.FontSize = 14;
+                textBlock.FontSize = 14;
+
+
+                /*Adding the children
+                 * hierarchy: 
+                 * 0: LB_ActiveOrders
+                 * 1: NewStackPanel
+                 * 2: textBlock + comboBox  
+                */
+                NewStackPanel.Children.Add(textBlock);
+                NewStackPanel.Children.Add(comboBox);
+                LB_ActiveOrders.Items.Add(NewStackPanel);
+            }
+            //MessageBox.Show("Orders loaded");
+        }
+        private void DataSelected(object sender, SelectionChangedEventArgs e)
+        {
+            CustomComboBox comboBox = sender as CustomComboBox;
+            Status orderStatus = (Status)comboBox.SelectedItem;
+            if(orderStatus == Status.Delivered)
+            {
+                using (PizzeriaDBContext db = new PizzeriaDBContext())
+                {
+                    try
+                    {
+                        StackPanel cbParent = comboBox.Parent as StackPanel;
+                        LB_ActiveOrders.Items.Remove(cbParent);
+                        // change the status in DB to delivered
+
+                        Order order = db.Orders.FirstOrDefault(o => o.OrderID == comboBox.id);
+                        order.OrderStatus = "completed";
+                        db.SaveChanges();
+                        MessageBox.Show($"Order {order.OrderID} finished.");
+                    }
+                    catch (Exception ex)
+                    {
+                        AppUtilities.ShowError(ex, "Something went wrong when changing order status. ");
+                    }
+                }
+
+            }
         }
     }
 }

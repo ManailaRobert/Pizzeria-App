@@ -64,6 +64,80 @@ namespace Pizzeria
             lb.ItemsSource= CartList.ToList();
         }
 
+        public static List<Order> LoadLBOrders (int type , ListBox lb = null, List<Order> OrderList = null,string customerName = "")
+        {
+            if(type == 0)
+            {
+                //all orders 
+                List<Order> orderList = LoadOrderList(type);
+                lb.ItemsSource = orderList;
+                lb.SelectedItem = -1;
+                return orderList;
+
+
+            }
+            else if(type == 1)
+            {
+                //active orders
+                List<Order> orderList = LoadOrderList(type);
+                return orderList;
+            }
+            else
+            {
+                //all orders by client name
+                List<Order> orderList = LoadOrderList(type);
+                lb.ItemsSource = orderList;
+                lb.SelectedItem = -1;
+                return orderList;
+            }
+        }
+        private static List<Order> LoadOrderList(int type,string customerName = "")
+        {
+            List<Order> list = new List<Order>();
+            if(type == 0)
+            {
+                //all orders
+                using (PizzeriaDBContext db = new PizzeriaDBContext())
+                {
+                    try
+                    {
+                        list = db.Orders
+                            .Include(ob => ob.OrderBeverages).ThenInclude(b => b.Beverage)
+                            .Include(op => op.OrderPizza).ThenInclude(p => p.Pizza).ThenInclude(s => s.Size)
+                            .Include(c => c.Customer)
+                            .Include(a => a.Adress)
+                            .ToList();
+                    }
+                    catch (Exception ex)
+                    {
+                        ShowError(ex, "Something went wrong wen loading order list");
+                    }
+                }
+            }
+            else if(type == 1)
+            {
+                // active orders
+                using(PizzeriaDBContext db = new PizzeriaDBContext())
+                {
+                    try
+                    {
+                        list = db.Orders
+                            .Include(ob => ob.OrderBeverages)
+                                .ThenInclude(b => b.Beverage)
+                            .Include(op => op.OrderPizza)
+                                .ThenInclude(p => p.Pizza)
+                                .ThenInclude(s => s.Size)
+                            .Where(s => string.Equals(s.OrderStatus, "active") == true)
+                            .ToList();
+                    }
+                    catch(Exception ex)
+                    {
+                        ShowError(ex, "Something went wrong wen loading order list");
+                    }
+                }
+            }
+            return list;
+        }
         private static List<Sizes> LoadSizesList()
         {
             List<Sizes> sizes = new List<Sizes>();
@@ -108,11 +182,12 @@ namespace Pizzeria
                                 .ThenInclude(ingredientsGroup => ingredientsGroup.Ingredient)
                                 .Where(pizza => string.Equals(pizza.Custom, "nu"))
                                 .ToList();
-                        else PizzaList = dB.Pizza
+                        else PizzaList = dB.Pizza //normal pizza by sizes
                             .Include(pizza => pizza.Size)
                             .Include(pizza => pizza.IngredientsGroup)
                             .ThenInclude(ingredientsGroup => ingredientsGroup.Ingredient)
                             .Where(pizza => pizza.SizeID == sizeId)
+                            .Where(pizza => string.Equals(pizza.Custom, "nu"))
                             .ToList();
                     }
                     else

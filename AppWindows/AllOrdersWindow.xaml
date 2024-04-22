@@ -10,19 +10,15 @@
 
     <Grid>
         <StackPanel Margin="60,54,480,66" Width="356" >
-            <StackPanel Orientation="Horizontal">
-                <TextBox x:Name="TB_ClientName" Width="207" Margin="0,0,20,0">Client Name</TextBox>
-                <Button Width="30">></Button>
-            </StackPanel>
-            <ListBox Height="247" Width="356" Margin="0,15,0,0" />
+            <Label  Width="207" Foreground="White" Height="25" HorizontalAlignment="Left" >Orders</Label>
+            <ListBox x:Name="LB_AllOrders" Height="247" Width="356" Margin="0,10,0,0" SelectionChanged="LB_AllOrders_SelectionChanged" />
         </StackPanel>
         <StackPanel Margin="480,54,60,38">
-            <TextBox Height="20" Margin="0,35,0,0" TextAlignment="Center" IsEnabled="False">Order ID</TextBox>
-            <ListBox Height="207"></ListBox>
-            <TextBox Height="20" TextAlignment="Right" IsEnabled="False">Price</TextBox>
+            <TextBox x:Name="TB_OrderID" Height="20" Margin="0,35,0,0" TextAlignment="Center" IsEnabled="False">Order ID</TextBox>
+            <ListBox x:Name="LB_Details" Height="207"/>
+            <TextBox x:Name="TB_TotalPrice" Height="20" TextAlignment="Right" IsEnabled="False">Price</TextBox>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
-                <TextBox Margin="0,0,10,0">Number of Orders</TextBox>
-                <Button Width="75">Make Report</Button>
+                <Button x:Name="BTN_CreateReport" Width="75" Click="BTN_CreateReport_Click">Make Report</Button>
             </StackPanel>
         </StackPanel>
     </Grid>
