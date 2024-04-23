@@ -29,7 +29,7 @@ namespace Pizzeria
         }
         public static void LoadLBPizza (ListBox lb, List<Pizza> PizzaList,int type = 0,int sizeID = -1)
         {
-            // type = 0 all pizzas
+            // type = 0 all pizzas/ type = 1 pizza with or without sizes (sizeId)/ type = n just custom pizza
             PizzaList = LoadPizzaList(type,sizeID);
             lb.ItemsSource = PizzaList;
         }

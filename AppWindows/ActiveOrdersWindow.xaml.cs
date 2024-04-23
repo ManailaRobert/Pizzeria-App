@@ -22,7 +22,7 @@ namespace Pizzeria.AppWindows
     public partial class Active_Orders_Window : Page
     {
 
-        class CustomComboBox:ComboBox
+        private class CustomComboBox:ComboBox
         {
             public int id;
         }

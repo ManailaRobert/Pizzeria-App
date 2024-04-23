@@ -11,23 +11,20 @@ namespace Pizzeria
 {
     class PizzeriaDBContext:DbContext
     {
-        public DbSet<Pizza> Pizza { get; set; }
-        public DbSet<Adress> Adresses { get; set; }
-        public DbSet<Beverage> Beverages { get; set; }
-        public DbSet<Customers> Customers { get; set; }
+        public DbSet<Pizza> Pizza { get; set;}
+        public DbSet<Adress> Adresses { get; set;}
+        public DbSet<Beverage> Beverages { get; set;}
+        public DbSet<Customers> Customers { get; set;}
         public DbSet<Ingredient> Ingredients { get; set;}
-        public DbSet<IngredientsGroup> IngredientsGroup { get; set; }
-        public DbSet<OrderBeverage> OrderBeverage { get; set; }
-
+        public DbSet<IngredientsGroup> IngredientsGroup { get; set;}
+        public DbSet<OrderBeverage> OrderBeverage { get; set;}
         public DbSet<OrderPizza> OrderPizza { get; set;}
-        public DbSet<Order> Orders { get; set; }
-        public DbSet<Sizes> Sizes { get; set; }
-
+        public DbSet<Order> Orders { get; set;}
+        public DbSet<Sizes> Sizes { get; set;}
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //optionsBuilder.UseSqlServer("Server=RobertsComputer;Database=PizzeriaDB;Integrated Security=True;TrustServerCertificate=true", sqlServerOptions => sqlServerOptions.EnableRetryOnFailure());
             optionsBuilder.UseSqlServer("Server=RobertsLaptop;Database=PizzeriaDB;Integrated Security=True;TrustServerCertificate=true", sqlServerOptions => sqlServerOptions.EnableRetryOnFailure());
-
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
