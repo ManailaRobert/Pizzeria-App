@@ -2,8 +2,8 @@
 
 - It was made for a Collage project.
 - It has 3 parts and for it to function properly needs:
-1. Pizzeria Classes (
-2. Database (its unavailable)
+1. Pizzeria Classes (https://github.com/ManailaRobert/PizzeriaClasses)
+2. Database (it's unavailable)
 
 ## Used technologies 
 - Entity Framework for the conection between the Data base and the main deskstop app.
