@@ -6,5 +6,7 @@
 2. Database (its unavailable)
 
 ## Used technologies 
-- I have used Entity Framework for the conection between the Data base and the main deskstop app.
-- For interface it uses WPF .
+- Entity Framework for the conection between the Data base and the main deskstop app.
+- WPF for the interface.
+
+(#3 Big Project made)
